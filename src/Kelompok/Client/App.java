@@ -6,7 +6,7 @@ import java.net.*;
 class App {
   public static void main(String[] args) {
     try {
-      Socket socket = new Socket("192.168.43.45", 5000);
+      Socket socket = new Socket("IP_SERVER", 5000);
 
       PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
       BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
