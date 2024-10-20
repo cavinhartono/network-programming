@@ -8,30 +8,32 @@ class App {
   private static String IP_ADDRESS = "192.000.00.00";
 
   public static void main(String[] args) {
-    try {
-      Socket socket = new Socket(IP_ADDRESS, PORT);
+    sendCommandToServer(IP_ADDRESS, PORT);
+  }
 
-      if (socket.isConnected()) {
-        System.out.println("Successfully connected to server at " + socket.getInetAddress());
-      }
+  public static void sendCommandToServer(String ipAddress, int port) {
+    try (Socket socket = new Socket(ipAddress, port)) {
+      System.out.println("Successfully connected to server at " + socket.getInetAddress());
 
       PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
       BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
 
-      System.out.println("Enter command to execute on the remote machine:");
+      System.out.println("Masukan command (CMD) untuk mengakses ke server:");
       String command = consoleInput.readLine();
       out.println(command);
 
-      BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-      String response;
-      while ((response = in.readLine()) != null) {
-        System.out.println(response);
-      }
-
-      socket.close();
+      readServerResponse(socket);
     } catch (IOException e) {
       System.out.println("Could not connect to the server.");
       e.printStackTrace();
+    }
+  }
+
+  public static void readServerResponse(Socket socket) throws IOException {
+    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    String response;
+    while ((response = in.readLine()) != null) {
+      System.out.println(response);
     }
   }
 }
