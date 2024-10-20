@@ -7,39 +7,53 @@ class App {
   private static int PORT = 5000;
 
   public static void main(String[] args) {
-    try {
-      try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-        System.out.println("Server is listening on port 5000...");
+    startServer(PORT);
+  }
 
-        while (true) {
-          Socket socket = serverSocket.accept();
-          System.out.println("Client connected from " + socket.getInetAddress());
+  public static void startServer(int port) {
+    try (ServerSocket serverSocket = new ServerSocket(port)) {
+      System.out.println("Server is listening on port 5000...");
 
-          BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-          String command = in.readLine();
-          System.out.println("Command received: " + command);
-
-          Runtime runtime = Runtime.getRuntime();
-          Process process = runtime.exec(command);
-
-          BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-          BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
-          PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-          String s;
-          while ((s = stdInput.readLine()) != null) {
-            out.println(s);
-          }
-          while ((s = stdError.readLine()) != null) {
-            out.println("Error: " + s);
-          }
-
-          socket.close();
-          System.out.println("Client disconnected");
-        }
+      while (true) {
+        Socket socket = serverSocket.accept();
+        handleClient(socket);
       }
     } catch (IOException e) {
       e.printStackTrace();
+    }
+  }
+
+  public static void handleClient(Socket socket) {
+    try {
+      System.out.println("Client connected from " + socket.getInetAddress());
+
+      BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      String command = in.readLine();
+      System.out.println("Command received: " + command);
+
+      execute(command, socket);
+
+      socket.close();
+      System.out.println("Client disconnected");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void execute(String command, Socket socket) throws IOException {
+    Runtime runtime = Runtime.getRuntime();
+    Process process = runtime.exec(command);
+
+    BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+    String s;
+    while ((s = stdInput.readLine()) != null) {
+      out.println(s);
+    }
+    while ((s = stdError.readLine()) != null) {
+      out.println("Error: " + s);
     }
   }
 }
