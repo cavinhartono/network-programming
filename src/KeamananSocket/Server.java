@@ -16,6 +16,10 @@ class Server {
     startServer(PORT);
   }
 
+  /*
+   * Fungsi generateHash() -> Menghasilkan hash menggunakan algoritma SHA-256 
+   * dan mengembalikan nilai hash dalam format Base64
+   */
   public static String generateHash(String data) throws NoSuchAlgorithmException {
     MessageDigest digest = MessageDigest.getInstance("SHA-256");
     byte[] encodedHash = digest.digest(data.getBytes());
@@ -57,6 +61,9 @@ class Server {
        */
       BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+      /*
+       * Mengambil command dari client dan dienkripsikan menggunakan fungsi `generateHash(command)`
+       */
       String receivedHash = in.readLine();
       System.out.println("Command dienkripsikan: " + receivedHash);
 
